@@ -1,25 +1,39 @@
-name: Main Workflow
+name: Build & upload new version
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   build:
-    name: Build
-    strategy:
-      matrix:
-        rust-version: ["1.59", "stable"]
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
+
     steps:
-      - name: Repository Checkout
+      - name: Checkout
         uses: actions/checkout@v3
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Cache
-        uses: Swatinem/rust-cache@v2
+      - name: Build win64
+        run: cargo build --release
 
-      - name: Run Unit Tests
-        run: |
-          cargo check
-          cargo test
+      - name: Prepare win64 Binary
+        run: mv target/release/discrakt.exe target/release/discrakt_win64.exe
+
+      - name: Create silent win64 executable
+        run: sed -i '1i\#\!\[windows_subsystem\ \=\ \"windows\"\]' src/main.rs
+
+      - name: Build silent win64 executable
+        run: cargo build --release
+
+      - name: Prepare silent win64 Binary
+        run: mv target/release/discrakt.exe target/release/discrakt_win64_silent.exe
+
+      - name: Upload files
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist files
+          path: target/release/discrakt_*
