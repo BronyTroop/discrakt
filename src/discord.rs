@@ -119,8 +119,7 @@ impl Discord {
             .assets(
                 Assets::new()
                     .large_image(&img)
-                    .small_image("trakt")
-                    .small_text("Trakt.tv"),
+                    .large_text("Powered by Discrakt"),
             )
             .timestamps(
                 Timestamps::new()
@@ -128,8 +127,7 @@ impl Discord {
                     .end(watch_time.end_date.timestamp()),
             )
             .buttons(vec![
-                Button::new("IMDB", &payload_data.link_imdb),
-                Button::new("Trakt", &payload_data.link_trakt),
+                Button::new("See on Trakt.tv", &payload_data.link_trakt),
             ]);
 
         log(&format!(
